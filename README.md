@@ -4,7 +4,7 @@
 **Çocuklar için %100 Çevrimdışı çalışan, uçak yolculuklarına özel tasarlanmış Artırılmış Gerçeklik (AR) eğitici dedektiflik oyunu!**
 
 [![Oynanış GIF'i/Ekran Görüntüsü](https://via.placeholder.com/600x300.png?text=Oynanış+Görseli+Buraya+Ekle!)](link-to-video-or-more-screenshots)
-*(Projenizden çarpıcı bir GIF veya ekran görüntüsünü buraya ekleyin! Uçak tepsisi üzerinde gibi bir görsel harika olur.)*
+
 
 Çocukların uçak, araba veya internetin olmadığı herhangi bir yerde sıkılmadan vakit geçirmesi ve aynı zamanda öğrenmesi için tasarlandı! Dedektif Pati, minik kaşifleri dünyaca ünlü tarihi yapıların gizemlerini çözmeye davet ediyor.
 
@@ -14,7 +14,7 @@
 
 *   📶 **Tamamen Çevrimdışı Çalışma:** Uçak modu veya internetsiz ortamlarda kesintisiz oyun deneyimi.
 *   ✈️ **Seyahat Dostu:** Özellikle uçak yolculukları için tasarlandı; uçak tepsisi gibi küçük yüzeylerde oynamak için ideal.
-*   🗿 **Ünlü Tarihi Mekanlar:** Big Ben, Eyfel Kulesi gibi ikonik yapıları ve çevrelerini 3D AR olarak keşfedin. (*Şu anki versiyonda bulunanları listeleyebilirsiniz*)
+*   🗿 **Ünlü Tarihi Mekanlar:** Big Ben, Eyfel Kulesi gibi ikonik yapıları ve çevrelerini 3D AR olarak keşfedin. 
 *   👇 **Kolay Sanal Navigasyon:** Fiziksel olarak hareket etmeye gerek yok! Ekrondaki basit sanal kontroller (joystick/oklar) ile modelin etrafında gezinin.
 *   🔍 **Gizli İpuçları & Keşif:** Sevimli Dedektif Pati'nin yönlendirmesiyle tarihi yapılar üzerindeki kayıp parçaları bulun.
 *   🧠 **Eğlenerek Öğrenme (Edutainment):** Her keşfedilen parçadan sonra tarihi mekanlarla ilgili yaşa uygun, ilgi çekici bilgiler öğrenin.
@@ -44,22 +44,23 @@
 
 ## 💻 Teknoloji Stack'i
 
-*   **Oyun Motoru:** Unity (Örn: Unity 202X.X.X)
+*   **Oyun Motoru:** Unity 
 *   **Programlama Dili:** C#
 *   **AR Platformu:** AR Foundation (iOS için ARKit, Android için ARCore'u kapsar)
 *   **UI:** Unity UI (TextMeshPro ile birlikte)
-*   **Lokal Veri:** PlayerPrefs (veya basit dosya/JSON) - Kullanıcı ilerlemesi ve ayarlar için.
+*   **Lokal Veri:** PlayerPrefs  - Kullanıcı ilerlemesi ve ayarlar için.
 
 ---
 
 ## 🚀 Proje Durumu & Yol Haritası
 
-*   **Mevcut Durum:** [Geliştirme Aşamasında / Alfa / Beta / Yayınlandı]
+*   **Mevcut Durum:** Geliştirme Aşamasında 
 *   **Şu Anda Mevcut Mekanlar:**
-    *   Big Ben (Londra)
-    *   Eyfel Kulesi (Paris)
-    *   *(Diğerlerini ekleyin)*
+   -
+    
 *   **Planlanan Özellikler/Mekanlar:**
+     *   Big Ben (Londra)
+    *   Eyfel Kulesi (Paris)
     *   Kolezyum (Roma) eklemek
     *   Piramitler (Mısır) eklemek
     *   Daha fazla interaktif görev türü
@@ -69,9 +70,6 @@
 ---
 
 ## 🔧 Kurulum ve Çalıştırma (Geliştiriciler İçin)
-
-*(Eğer proje açık kaynak değilse veya kolayca build edilemiyorsa bu bölümü daha kısa tutabilir veya kaldırabilirsiniz)*
-
 1.  Bu repoyu klonlayın: `git clone https://github.com/kullanici-adiniz/repo-adiniz.git`
 2.  Projeyi Unity Hub üzerinden açın (Doğru Unity versiyonunu kullandığınızdan emin olun).
 3.  Gerekli paketlerin (AR Foundation, ARKit XR Plugin, ARCore XR Plugin vb.) Unity Package Manager üzerinden yüklü olduğundan emin olun.
@@ -80,20 +78,14 @@
 
 ---
 
-## 🤝 Katkıda Bulunma
 
-*(Eğer katkı kabul ediyorsanız)*
-Katkılarınız için teşekkür ederiz! Lütfen katkıda bulunma rehberimiz için `CONTRIBUTING.md` dosyasına göz atın (henüz yoksa oluşturabilirsiniz) veya bir Issue açarak fikirlerinizi belirtin.
 
----
 
-## 📄 Lisans
-
-Bu proje [LİSANSI BURAYA EKLE - Örn: MIT Lisansı] altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
 
 ---
+
 
 ## 📫 İletişim
 
-*   [Adınız / Takım Adı]
-*   [E-posta adresiniz veya iletişim linkiniz - İsteğe Bağlı]
+*   [Adil Can Kural]
+*   [E-posta : 210541023@firat.edu.tr]
