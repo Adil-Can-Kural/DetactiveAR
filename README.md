@@ -90,3 +90,5 @@
 *   [Adil Can Kural]
 *   [E-posta : 210541023@firat.edu.tr]
 *   [Trello : https://trello.com/b/WFMt2ofz/detectivear]
+*   [Kişisel site : [E-posta : 210541023@firat.edu.tr]]
+*   
