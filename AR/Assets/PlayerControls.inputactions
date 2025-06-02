@@ -1,0 +1,65 @@
+{
+    "name": "PlayerControls",
+    "maps": [
+        {
+            "name": "AnaMenuGirdileri",
+            "id": "020f35bc-1feb-40f4-8b0f-ccf7a07b37ec",
+            "actions": [
+                {
+                    "name": "BirincilDokunma",
+                    "type": "Button",
+                    "id": "8cf33c59-0485-4733-99be-cc887cb97d84",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "EkranPozisyonu",
+                    "type": "Value",
+                    "id": "5b31a438-3180-499c-8c98-d042a303c143",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f0b7dd89-672d-4695-b2f0-3e3cc92dc2b4",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BirincilDokunma",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "228d7cb0-b754-423e-9ab2-d544201860f3",
+                    "path": "<Touchscreen>/primaryTouch/tap",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "BirincilDokunma",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ac70b3d6-266b-47a5-8892-2191b1dd0a44",
+                    "path": "<Pointer>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EkranPozisyonu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
