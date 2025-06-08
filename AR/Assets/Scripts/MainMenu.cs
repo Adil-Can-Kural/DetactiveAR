@@ -92,7 +92,7 @@ public class MainMenu : MonoBehaviour
         {
             PlayerPrefs.SetString("SelectedLandmark", landmarkName);
             PlayerPrefs.Save();
-            SceneManager.LoadScene("ARScene");
+            SceneManager.LoadScene("RealARScene");
         }
         else
         {

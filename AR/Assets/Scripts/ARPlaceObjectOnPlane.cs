@@ -1,184 +1,203 @@
-using UnityEngine;
-using System.Collections.Generic;
-using UnityEngine.XR.ARFoundation; // ARPlane, ARRaycastManager için
-using UnityEngine.XR.ARSubsystems; // TrackableType, ARSessionState için
-using UnityEngine.InputSystem;   // InputActionReference için
+ï»¿using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems; // PlaneAlignment, TrackableId iÃ§in
+using System.Collections.Generic; // Listeler iÃ§in
 
-public class ARPlaceObjectOnPlane : MonoBehaviour
+public class ARPlaceObjectOnPlane : MonoBehaviour // Otomatik YerleÅŸtirme iÃ§in
 {
-    [Header("Temel Ayarlar")]
-    public GameObject objectToPlacePrefab;    // Inspector'dan atanacak model prefabı
-    public ARRaycastManager raycastManager;   // Sahnedeki ARRaycastManager
+    [Header("Model ve AR AyarlarÄ±")]
+    public GameObject objectToPlacePrefab;    // YerleÅŸtirilecek model prefabÄ±
+    public ARPlaneManager planeManager;         // Sahnedeki ARPlaneManager
 
-    [Header("Giriş Ayarları (Input System)")]
-    [Tooltip("Genel tıklama/dokunma Action'ını (örn: DefaultInputActions -> UI -> Click VEYA kendi oluşturduğunuz BirincilDokunma) buraya atayın.")]
-    public InputActionReference placeObjectAction; // Tıklama/Dokunma eylemi için referans
+    [Tooltip("Modelin yerleÅŸtirileceÄŸi dÃ¼zlemin en az bu kadar geniÅŸlik VE derinlikte olmasÄ± gerekir (metre).")]
+    public float minPlaneDimension = 0.4f;
 
-    [Header("Opsiyonel Ayarlar")]
-    public ARPlaneManager planeManager;         // Düzlem görsellerini gizlemek için
-    public bool hidePlanesAfterPlacement = true; // Model yerleştirildikten sonra düzlemleri gizle
+    [Tooltip("Model yerleÅŸtirildikten sonra dÃ¼zlem gÃ¶rselleri gizlensin mi?")]
+    public bool hidePlanesAfterPlacement = true;
+
+    [Tooltip("Model yerleÅŸtirildikten sonra yeni dÃ¼zlem algÄ±lama dursun mu?")]
+    public bool disablePlaneDetectionAfterPlacement = true;
+
 
     private GameObject spawnedObject;
-    private List<ARRaycastHit> hits = new List<ARRaycastHit>();
-
-    // Pozisyon için ayrı bir Action (En iyi pratik)
-    // Bunu da Inspector'dan atamanız ve Input Actions Asset'inizde <Pointer>/position binding'i olan
-    // bir Vector2 Value Action oluşturmanız gerekir.
-    [Header("Giriş Pozisyonu (Önerilen)")]
-    [Tooltip("<Pointer>/position binding'i olan bir Vector2 Value Action'ını buraya atayın.")]
-    public InputActionReference pointerPositionAction;
-
+    private bool objectHasBeenPlaced = false;
 
     void Awake()
     {
-        Debug.Log("ARPlaceObjectOnPlane Awake çağrıldı.");
-
-        if (raycastManager == null)
-        {
-            raycastManager = FindObjectOfType<ARRaycastManager>();
-            if (raycastManager == null) Debug.LogError("ARRaycastManager sahnede bulunamadı! Bu script düzgün çalışmayacak.");
-        }
+        Debug.Log("ARPlaceObjectOnPlane (Auto): Awake Ã§aÄŸrÄ±ldÄ±.");
         if (planeManager == null)
         {
             planeManager = FindObjectOfType<ARPlaneManager>();
-            // PlaneManager opsiyonel olduğu için hata logu şart değil.
-        }
-
-        // --- INPUT ACTION KURULUMU ---
-        if (placeObjectAction == null || placeObjectAction.action == null)
-        {
-            Debug.LogError("ARPlaceObjectOnPlane: 'Place Object Action' atanmamış veya Action null! Lütfen Inspector'dan atayın. Tıklama/dokunma çalışmayacak.");
-            enabled = false; // Scripti devre dışı bırakabiliriz
-            return;
-        }
-        // İsteğe bağlı: Eğer pozisyon için ayrı bir Action kullanmıyorsanız, aşağıdaki logu ve enabled = false satırını yorum satırı yapın.
-        if (pointerPositionAction == null || pointerPositionAction.action == null)
-        {
-            Debug.LogWarning("ARPlaceObjectOnPlane: 'Pointer Position Action' atanmamış. Pozisyon almak için doğrudan cihaz sorgusu kullanılacak (daha az güvenilir olabilir).");
-            // enabled = false; // Eğer bu Action zorunluysa scripti devre dışı bırak
-        }
-
-        // Action'ları etkinleştir
-        placeObjectAction.action.Enable();
-        if (pointerPositionAction != null && pointerPositionAction.action != null)
-        {
-            pointerPositionAction.action.Enable();
-        }
-        Debug.Log("ARPlaceObjectOnPlane: Input Action(lar) etkinleştirildi.");
-    }
-
-    void OnEnable()
-    {
-        // 'performed' olayına abone ol
-        if (placeObjectAction != null && placeObjectAction.action != null)
-        {
-            placeObjectAction.action.performed += OnPlaceObjectInputTriggered;
-            Debug.Log("ARPlaceObjectOnPlane: 'placeObjectAction.performed' olayına abone olundu.");
-        }
-    }
-
-    void OnDisable()
-    {
-        // Abonelikten çık
-        if (placeObjectAction != null && placeObjectAction.action != null)
-        {
-            placeObjectAction.action.performed -= OnPlaceObjectInputTriggered;
-            Debug.Log("ARPlaceObjectOnPlane: 'placeObjectAction.performed' olayından abonelik kaldırıldı.");
-            // Action'ları burada disable etmeye genellikle gerek yoktur,
-            // özellikle de başka scriptler aynı Action'ı kullanıyorsa.
-            // placeObjectAction.action.Disable();
-            // if (pointerPositionAction != null && pointerPositionAction.action != null) pointerPositionAction.action.Disable();
-        }
-    }
-
-    private void OnPlaceObjectInputTriggered(InputAction.CallbackContext context)
-    {
-        if (!this.enabled || objectToPlacePrefab == null) // Script aktif değilse veya prefab yoksa çık
-        {
-            if (objectToPlacePrefab == null) Debug.LogWarning("ARPlaceObjectOnPlane: Yerleştirilecek Prefab atanmamış!");
-            return;
-        }
-
-        if (spawnedObject != null)
-        {
-            Debug.Log("ARPlaceObjectOnPlane: Obje zaten yerleştirilmiş. Yeni tıklama yok sayılıyor.");
-            return;
-        }
-
-        Vector2 screenPositionToRaycast;
-
-        // Tercih edilen yöntem: Ayrı bir Pointer Position Action kullanmak
-        if (pointerPositionAction != null && pointerPositionAction.action != null && pointerPositionAction.action.enabled)
-        {
-            screenPositionToRaycast = pointerPositionAction.action.ReadValue<Vector2>();
-            Debug.Log($"ARPlaceObjectOnPlane: Pointer Position Action'dan pozisyon okundu: {screenPositionToRaycast}");
-        }
-        // Fallback: Eğer Pointer Position Action atanmamışsa, doğrudan cihazdan okumayı dene (daha az güvenilir)
-        else if (Pointer.current != null && Pointer.current.deviceId != InputDevice.InvalidDeviceId)
-        {
-            screenPositionToRaycast = Pointer.current.position.ReadValue();
-            Debug.LogWarning($"ARPlaceObjectOnPlane: Pointer Position Action atanmamış. Pointer.current kullanılıyor. Pozisyon: {screenPositionToRaycast}");
-        }
-        else if (Touchscreen.current != null && Touchscreen.current.deviceId != InputDevice.InvalidDeviceId && Touchscreen.current.primaryTouch.isInProgress)
-        {
-            screenPositionToRaycast = Touchscreen.current.primaryTouch.position.ReadValue();
-            Debug.LogWarning($"ARPlaceObjectOnPlane: Pointer Position Action atanmamış. Touchscreen.current kullanılıyor. Pozisyon: {screenPositionToRaycast}");
-        }
-        else
-        {
-            Debug.LogError("ARPlaceObjectOnPlane: Geçerli bir ekran pozisyonu alınamadı!");
-            return;
-        }
-
-        Debug.Log($"ARPlaceObjectOnPlane: Raycast için kullanılacak ekran pozisyonu: {screenPositionToRaycast}");
-
-        if (raycastManager.Raycast(screenPositionToRaycast, hits, TrackableType.PlaneWithinPolygon))
-        {
-            Pose hitPose = hits[0].pose;
-            spawnedObject = Instantiate(objectToPlacePrefab, hitPose.position, hitPose.rotation);
-            Debug.Log("Obje yerleştirildi: " + spawnedObject.name + " at " + hitPose.position);
-
-            // Modelin yönünü ayarla (kameranın Y açısına göre)
-            spawnedObject.transform.eulerAngles = new Vector3(0, Camera.main.transform.eulerAngles.y, 0);
-
-            if (hidePlanesAfterPlacement && planeManager != null)
+            if (planeManager == null)
             {
-                SetAllPlanesActive(false);
+                Debug.LogError("ARPlaneManager sahnede bulunamadÄ±! Otomatik yerleÅŸtirme Ã§alÄ±ÅŸmayacak.");
+                enabled = false;
+                return;
             }
         }
-        else
+        if (objectToPlacePrefab == null)
         {
-            Debug.Log("ARPlaceObjectOnPlane: Raycast herhangi bir AR düzlemiyle kesişmedi.");
+            Debug.LogError("Object To Place Prefab atanmamÄ±ÅŸ! Otomatik yerleÅŸtirme Ã§alÄ±ÅŸmayacak.");
+            enabled = false;
+            return;
         }
     }
+    // void Update()
+    // {
+    //  if (spawnedObject != null)
+    //  {
+    // float dist = Vector3.Distance(Camera.main.transform.position, spawnedObject.transform.position);
+    //Debug.Log($"ğŸ“ Kamera â†” Model uzaklÄ±k: {dist:F2} m");
+
+    //Vector3 direction = (spawnedObject.transform.position - Camera.main.transform.position).normalized;
+    // float dot = Vector3.Dot(Camera.main.transform.forward, direction);
+    //Debug.Log($"ğŸ‘ï¸ GÃ¶rÃ¼ÅŸ yÃ¶nÃ¼ne gÃ¶re aÃ§Ä± (dot): {dot:F2}");
+    //}
+    // }
+
+    void OnEnable() // Script veya XR Origin aktif olduÄŸunda
+    {
+        Debug.Log("ARPlaceObjectOnPlane (Auto): EtkinleÅŸtirildi, planesChanged olayÄ±na abone olunuyor.");
+        planeManager.planesChanged += OnPlanesChanged;
+        // Script aktif olduÄŸunda hemen mevcut dÃ¼zlemleri de kontrol et
+        if (gameObject.activeInHierarchy && enabled) // Sadece obje gerÃ§ekten aktifse
+        {
+            CheckExistingPlanesAndPlace();
+        }
+    }
+
+    void OnDisable() // Script veya XR Origin deaktif olduÄŸunda
+    {
+        Debug.Log("ARPlaceObjectOnPlane (Auto): Devre dÄ±ÅŸÄ± bÄ±rakÄ±ldÄ±, planesChanged olayÄ±ndan abonelik kaldÄ±rÄ±lÄ±yor.");
+        if (planeManager != null) // planeManager null deÄŸilse abonelikten Ã§Ä±k
+        {
+            planeManager.planesChanged -= OnPlanesChanged;
+        }
+
+        // Opsiyonel: EÄŸer bu script deaktif olduÄŸunda (Ã¶rn: 3D moda geÃ§iÅŸ)
+        // sahnede kalan modeli de yok etmek isterseniz.
+        // if (spawnedObject != null)
+        // {
+        //     Destroy(spawnedObject);
+        //     spawnedObject = null;
+        //     objectHasBeenPlaced = false;
+        // }
+    }
+
+    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    {
+        if (objectHasBeenPlaced || !this.enabled || !gameObject.activeInHierarchy) return;
+
+        foreach (ARPlane plane in args.added)
+        {
+            if (IsValidPlaneForPlacement(plane))
+            {
+                PlaceObject(plane);
+                return;
+            }
+        }
+        foreach (ARPlane plane in args.updated)
+        {
+            if (IsValidPlaneForPlacement(plane))
+            {
+                PlaceObject(plane);
+                return;
+            }
+        }
+    }
+
+    void CheckExistingPlanesAndPlace()
+    {
+        if (objectHasBeenPlaced || !this.enabled || !gameObject.activeInHierarchy) return;
+
+        // planeManager.trackables canlÄ± bir koleksiyon olduÄŸu iÃ§in doÄŸrudan dÃ¶nebiliriz
+        // Yeni bir liste oluÅŸturmaya gerek yok.
+        Debug.Log($"Mevcut {planeManager.trackables.count} dÃ¼zlem kontrol ediliyor...");
+        foreach (ARPlane plane in planeManager.trackables)
+        {
+            if (plane.gameObject.activeSelf && IsValidPlaneForPlacement(plane)) // Sadece aktif dÃ¼zlemleri kontrol et
+            {
+                PlaceObject(plane);
+                return;
+            }
+        }
+        Debug.Log("CheckExistingPlanes: Uygun mevcut dÃ¼zlem bulunamadÄ±.");
+    }
+
+    bool IsValidPlaneForPlacement(ARPlane plane)
+    {
+        Debug.Log($"Plane {plane.trackableId} | Align: {plane.alignment} | Size: {plane.size}");
+
+        if (plane.alignment != PlaneAlignment.HorizontalUp) return false;
+        if (plane.size.x >= minPlaneDimension && plane.size.y >= minPlaneDimension)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    void PlaceObject(ARPlane onPlane)
+    {
+        if (spawnedObject != null)
+            Destroy(spawnedObject);
+
+        Vector3 worldPos = onPlane.transform.position;
+        Quaternion rotation = Quaternion.Euler(0, Camera.main.transform.eulerAngles.y, 0);
+
+        spawnedObject = Instantiate(objectToPlacePrefab, worldPos, rotation);
+        spawnedObject.transform.SetParent(null);
+        spawnedObject.transform.localScale = Vector3.one * 0.01f;
+
+        objectHasBeenPlaced = true;
+
+        Debug.Log($"âœ… Model yerleÅŸtirildi: {worldPos}");
+
+        // Plane'leri kapat
+        if (hidePlanesAfterPlacement)
+            SetAllPlanesActive(false);
+        if (disablePlaneDetectionAfterPlacement)
+            planeManager.enabled = false;
+
+        // SaatSpawnerâ€™a bildir (â— burasÄ± doÄŸru yer!)
+        FindObjectOfType<SaatSpawner>()?.SpawnSaati(spawnedObject);
+    }
+
+
+
+
+
+
+
 
     void SetAllPlanesActive(bool value)
     {
-        // planeManager null kontrolü OnPlaceObjectInputTriggered içinde yapıldığı için burada tekrar gerek yok, ama güvenlik için kalabilir.
         if (planeManager == null) return;
-
         foreach (ARPlane plane in planeManager.trackables)
         {
             plane.gameObject.SetActive(value);
         }
-        // Yeni düzlem algılamayı da durdurmak veya başlatmak isterseniz:
-        // planeManager.enabled = value;
-        // veya
-        // planeManager.requestedDetectionMode = value ? PlaneDetectionMode.Horizontal : PlaneDetectionMode.None;
     }
 
-    // Dışarıdan çağrılarak modeli sıfırlamak ve tekrar yerleştirmeye izin vermek için
     public void ResetAndAllowPlacement()
-    {
+    {   
+        Debug.Log("ARPlaceObjectOnPlane (Auto): ResetAndAllowPlacement Ã§aÄŸrÄ±ldÄ±.");
         if (spawnedObject != null)
         {
             Destroy(spawnedObject);
             spawnedObject = null;
         }
-        if (planeManager != null) // Eğer planeManager atanmışsa
+        objectHasBeenPlaced = false;
+
+        if (planeManager != null)
         {
+            if (!planeManager.enabled) planeManager.enabled = true;
             SetAllPlanesActive(true);
+            // Hemen mevcut dÃ¼zlemleri kontrol et ki yeni bir yerleÅŸtirme denensin
+            CheckExistingPlanesAndPlace();
         }
-        Debug.Log("ARPlaceObjectOnPlane: Obje yerleşimi sıfırlandı, tekrar yerleştirme için hazır.");
+        Debug.Log("Model yerleÅŸimi sÄ±fÄ±rlandÄ±, tekrar otomatik yerleÅŸtirme bekleniyor.");
     }
+    
 }
+    

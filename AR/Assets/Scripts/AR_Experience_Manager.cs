@@ -1,176 +1,101 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using UnityEngine.UI;
-// using TMPro; // Doðrudan kullanmýyorsa
+using System.Collections; // Coroutine için
+using static UnityEngine.UIElements.UxmlAttributeDescription;
+
+
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
 
 public class AR_Experience_Manager : MonoBehaviour
 {
     [Header("AR Sistem Referanslarý")]
     public ARSession arSession;
-    public GameObject xrOrigin;
-    public ARPlaceObjectOnPlane arPlacementScript; // Dokunmayla yerleþtirme scriptiniz
+    public GameObject xrOrigin; // ARPlaceObjectOnPlane bunun üzerinde veya bir çocuðu olmalý
 
-    [Header("3D Görüntüleyici Modu Referanslarý")]
-    public Camera viewerModeCamera;
-    public GameObject modelViewerAnchorObject; // PARLIAMENT modelini içeren parent (ve üzerinde ModelViewController olan)
-    public ModelViewController modelViewController; // modelViewerAnchorObject üzerindeki script
+    // 3D Görüntüleyici ve mod deðiþtirme ile ilgili tüm deðiþkenler kaldýrýldý.
+    // UI Manager referansý da artýk burada gerekmeyebilir, eðer sadece AR ise.
 
-    [Header("UI Kontrol Referanslarý")]
-    public AR_UIManager uiManager; // AR_UI_Canvas üzerindeki script
-    public GameObject arModeUIElements;  // Opsiyonel: Sadece AR Modunda aktif olacak UI
-    public GameObject viewerModeUIElements; // Opsiyonel: Sadece 3D Viewer moduna özel UI
-
-    // private GameObject spawnedModelInstance; // Artýk dinamik spawn etmiyoruz
-    private bool isARModeCurrentlyActive = true;
-
-    void Start()
+    IEnumerator Start()
     {
-        if (!ValidateReferences()) { enabled = false; return; }
+        Debug.Log("AR_Experience_Manager (Basit): Start ÇAÐRILDI.");
 
-        if (ARSession.state == ARSessionState.None || ARSession.state == ARSessionState.Unsupported)
+        if (arSession == null || xrOrigin == null)
         {
-            isARModeCurrentlyActive = false;
+            Debug.LogError("AR_Experience_Manager (Basit): ARSession veya XR Origin atanmamýþ! Script düzgün çalýþmayabilir.");
+            enabled = false;
+            yield break;
+        }
+
+        // Baþlangýçta XR Origin'i deaktif edelim, sonra izin ve uygunluk kontrolünden sonra aktif edelim
+        xrOrigin.SetActive(false);
+      
+#if UNITY_ANDROID
+if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+        {
+            Debug.Log("Kamera izni yok, isteniyor...");
+            Permission.RequestUserPermission(Permission.Camera);
+            float startTime = Time.time;
+            while (!Permission.HasUserAuthorizedPermission(Permission.Camera) && (Time.time - startTime < 15f))
+            {
+                Debug.Log("Kamera izni bekleniyor...");
+                yield return new WaitForSeconds(0.5f);
+            }
+            if (!Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
+                Debug.LogError("Kamera izni VERÝLMEDÝ! AR Modu baþlatýlamayacak.");
+                // Burada kullanýcýya bir UI mesajý gösterip ana menüye döndürmek veya uygulamayý kapatmak düþünülebilir.
+                // Þimdilik sadece AR'ý baþlatmamayý tercih ediyoruz.
+                yield break; // AR baþlatýlamaz, çýk
+            }
+            else Debug.Log("Kamera izni verildi.");
+        }
+        else Debug.Log("Kamera izni zaten var.");
+#endif
+
+        Debug.Log("AR Kullanýlabilirlik kontrolü baþlatýlýyor...");
+        // XR Origin'i ve ARSession'ý aktif et ki state kontrol edilebilsin
+        if (!arSession.gameObject.activeSelf) arSession.gameObject.SetActive(true);
+        if (!xrOrigin.activeSelf) xrOrigin.SetActive(true);
+
+        yield return null; // Bir frame bekle ki ARSession state'i güncellenebilsin
+
+        if (ARSession.state == ARSessionState.Unsupported || ARSession.state == ARSessionState.None || ARSession.state == ARSessionState.NeedsInstall)
+        {
+            Debug.LogError($"Cihaz AR desteklemiyor veya kurulum/güncelleme gerekli. ARSession.state: {ARSession.state}. AR Modu baþlatýlamýyor.");
+            // Burada da kullanýcýya bir mesaj gösterip ana menüye dönmek iyi olur.
+            xrOrigin.SetActive(false); // AR'ý tekrar kapat
+                                       // AR_UIManager üzerinden bir hata mesajý gösterme fonksiyonu çaðrýlabilir.
+            yield break; // AR baþlatýlamaz, çýk
         }
         else
         {
-            isARModeCurrentlyActive = true;
+            Debug.Log($"Cihaz AR destekliyor görünüyor. ARSession.state: {ARSession.state}. AR Modu etkinleþtiriliyor.");
+            // XR Origin zaten aktif edildi. ARPlaceObjectOnPlane scripti çalýþmaya baþlamalý.
+            // ARSession.Reset() çaðrýsý genellikle XR Origin aktif edildiðinde ve session hazýrsa ARFoundation tarafýndan yönetilir.
+            // Gerekiyorsa, spesifik bir durumda resetlemek için koþullu olarak çaðrýlabilir.
+            // Örneðin, bir hatadan sonra veya modu tekrar baþlatýrken. Þimdilik gerekmeyebilir.
         }
-
-        ApplyCurrentModeState(); // Baþlangýç modunu uygula
-        // Start sonunda uiManager'ýn buton metnini güncellemesini saðla
-        if (uiManager != null) uiManager.UpdateToggleModeButtonText();
+        Debug.Log("AR_Experience_Manager (Basit): Start TAMAMLANDI. AR Sistemi aktif olmalý.");
     }
 
-    bool ValidateReferences()
-    {
-        bool allValid = true;
-        if (arSession == null) { Debug.LogError("AR_Experience_Manager: ARSession atanmamýþ!"); allValid = false; }
-        if (xrOrigin == null) { Debug.LogError("AR_Experience_Manager: XR Origin atanmamýþ!"); allValid = false; }
-        if (arPlacementScript == null) { Debug.LogError("AR_Experience_Manager: ARPlaceObjectOnPlane (arPlacementScript) atanmamýþ!"); allValid = false; }
-        if (viewerModeCamera == null) { Debug.LogError("AR_Experience_Manager: ViewerModeCamera atanmamýþ!"); allValid = false; }
-        if (modelViewerAnchorObject == null) { Debug.LogError("AR_Experience_Manager: ModelViewerAnchorObject atanmamýþ!"); allValid = false; }
-        if (modelViewController == null) { Debug.LogError("AR_Experience_Manager: ModelViewController atanmamýþ!"); allValid = false; }
-        if (uiManager == null) { Debug.LogWarning("AR_Experience_Manager: AR_UIManager atanmamýþ."); allValid = false; } // Artýk önemli
-        return allValid;
-    }
-
-    public void SwitchMode()
-    {
-        if (ARSession.state == ARSessionState.None || ARSession.state == ARSessionState.Unsupported)
-        {
-            Debug.LogWarning("Cihaz AR desteklemediði için mod deðiþtirilemiyor. 3D modunda kalýnýyor.");
-            isARModeCurrentlyActive = false;
-        }
-        else
-        {
-            isARModeCurrentlyActive = !isARModeCurrentlyActive;
-        }
-        ApplyCurrentModeState();
-    }
-
-    void ApplyCurrentModeState()
-    {
-        if (isARModeCurrentlyActive)
-        {
-            // --- AR MODUNU AKTÝF ET ---
-            Debug.Log("AR Moduna geçiliyor.");
-            if (viewerModeCamera != null) viewerModeCamera.gameObject.SetActive(false);
-            if (modelViewerAnchorObject != null) modelViewerAnchorObject.SetActive(false); // Anchor'ý ve altýndaki modeli gizle
-            if (modelViewController != null) modelViewController.enabled = false;
-            if (viewerModeUIElements != null) viewerModeUIElements.SetActive(false);
-
-            if (xrOrigin != null) xrOrigin.SetActive(true);
-            if (arSession != null)
-            {
-                if (!arSession.gameObject.activeInHierarchy) arSession.gameObject.SetActive(true);
-                if (ARSession.state != ARSessionState.None && ARSession.state != ARSessionState.Unsupported &&
-                    (arSession.subsystem == null || !arSession.subsystem.running))
-                {
-                    arSession.Reset();
-                }
-            }
-            if (arPlacementScript != null)
-            {
-                arPlacementScript.enabled = true;
-                if (arPlacementScript.gameObject.activeInHierarchy)
-                { // Sadece eðer XR Origin aktifse Reset çaðýr
-                    arPlacementScript.ResetAndAllowPlacement();
-                }
-            }
-            if (arModeUIElements != null) arModeUIElements.SetActive(true);
-        }
-        else // 3D GÖRÜNTÜLEYÝCÝ MODU
-        {
-            Debug.Log("3D Görüntüleyici Moduna geçiliyor.");
-            // AR Elemanlarýný Kapat
-            if (arPlacementScript != null)
-            {
-                if (arPlacementScript.gameObject.activeInHierarchy)
-                {
-                    arPlacementScript.ResetAndAllowPlacement(); // AR'dan çýkarken AR modelini temizle
-                }
-                arPlacementScript.enabled = false;
-            }
-            if (arModeUIElements != null) arModeUIElements.SetActive(false);
-            if (xrOrigin != null) xrOrigin.SetActive(false); // Bu, içindeki ARPlaneManager vs.'yi de deaktif eder
-
-            // 3D Görüntüleyici Elemanlarýný Aç
-            if (viewerModeCamera != null)
-            {
-                viewerModeCamera.gameObject.SetActive(true);
-                Debug.Log("ApplyCurrentModeState (3D Modu): viewerModeCamera AKTÝF EDÝLDÝ.");
-            }
-            else Debug.LogError("viewerModeCamera referansý null!");
-
-            if (modelViewerAnchorObject != null)
-            {
-                modelViewerAnchorObject.SetActive(true); // <<<--- ANAHTAR SATIR
-                Debug.Log("ApplyCurrentModeState (3D Modu): modelViewerAnchorObject AKTÝF EDÝLDÝ. Mevcut durumu: " + modelViewerAnchorObject.activeSelf);
-            }
-            else Debug.LogError("modelViewerAnchorObject referansý null!");
-
-
-            if (modelViewController != null)
-            {
-                modelViewController.enabled = true;
-                Debug.Log("ApplyCurrentModeState (3D Modu): modelViewController ENABLED YAPILDI.");
-                // targetModel'in ModelViewController.Awake() veya Start() içinde
-                // kendi child'ý olarak ayarlandýðýný varsayýyoruz.
-                // viewerCamera'yý da ModelViewController içinde Awake/Start'ta veya buradan atamamýz lazým.
-                if (viewerModeCamera != null)
-                {
-                    modelViewController.viewerCamera = this.viewerModeCamera; // Emin olmak için burada atayalým
-                }
-                modelViewController.ResetView(); // Görünümü ilk haline getir
-            }
-            else Debug.LogError("modelViewController referansý null!");
-
-            if (viewerModeUIElements != null) viewerModeUIElements.SetActive(true);
-        }
-
-        if (uiManager != null)
-        {
-            uiManager.UpdateToggleModeButtonText();
-        }
-        Debug.Log("--- ApplyCurrentModeState TAMAMLANDI --- Mevcut Mod AR mý? " + isARModeCurrentlyActive);
-    }
-
-    public bool IsARModeActiveCurrently()
-    {
-        return isARModeCurrentlyActive;
-    }
-
+    // Sahneden çýkarken AR'ý düzgünce kapatmak için
     public void PrepareToLeaveScene()
     {
-        Debug.Log("Sahneden çýkýþa hazýrlanýlýyor...");
-        // Moddan baðýmsýz olarak her þeyi kapatmaya çalýþalým
-        if (xrOrigin != null) xrOrigin.SetActive(false);
-        if (arPlacementScript != null) arPlacementScript.enabled = false;
-
-        if (modelViewerAnchorObject != null) modelViewerAnchorObject.SetActive(false);
-        if (viewerModeCamera != null) viewerModeCamera.gameObject.SetActive(false);
-        if (modelViewController != null) modelViewController.enabled = false;
-        // isARModeCurrentlyActive = false; // Veya bir sonraki açýlýþ için varsayýlaný ayarla
+        Debug.Log("Sahneden çýkýþa hazýrlanýlýyor, AR kapatýlýyor...");
+        if (xrOrigin != null)
+        {
+            xrOrigin.SetActive(false); // Bu, içindeki ARPlaneManager, ARPlaceObjectOnPlane vb. deaktif eder.
+        }
+        // ARSession'ý da deaktif etmek veya durdurmak iyi bir pratik olabilir.
+        // if (arSession != null && arSession.subsystem != null && arSession.subsystem.running)
+        // {
+        //     arSession.subsystem.Stop();
+        // }
+        // veya
+        // if (arSession != null) arSession.gameObject.SetActive(false);
     }
+   
 }
