@@ -56,7 +56,7 @@
 
 *   **Mevcut Durum:** Geliştirme Aşamasında 
 *   **Şu Anda Mevcut Mekanlar:**
-   - Big Ben (Londra)(Tam Değil)
+   - Big Ben (Londra)
     
 *   **Planlanan Özellikler/Mekanlar:**
     *   Eyfel Kulesi (Paris)
