@@ -56,7 +56,7 @@ Dedektif Pati Oynanış Videosu :
 
 ## 🚀 Proje Durumu & Yol Haritası
 
-*   **Mevcut Durum:** Geliştirme Aşamasında 
+*   **Mevcut Durum:** Geliştirme Aşamasında(Bir Mekan Tamamkandı)
 *   **Şu Anda Mevcut Mekanlar:**
    - Big Ben (Londra)
     
