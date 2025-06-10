@@ -3,7 +3,7 @@
 
 **Çocuklar için %100 Çevrimdışı çalışan, uçak yolculuklarına özel tasarlanmış Artırılmış Gerçeklik (AR) eğitici dedektiflik oyunu!**
 
-[![Oynanış GIF'i/Ekran Görüntüsü]([[https://via.placeholder.com/600x300.png?text=Oynanış+Görseli+Buraya+Ekle!)]([[link-to-video-or-more-screenshots](https://youtu.be/ebWTkxpPLpg))]([https://youtu.be/ebWTkxpPLpg)](https://youtu.be/ebWTkxpPLpg](https://youtu.be/bbRCyl6DJQU)))
+[![Oynanış GIF'i/Ekran Görüntüsü]([[https://via.placeholder.com/600x300.png?text=Oynanış+Görseli+Buraya+Ekle!)](https://youtu.be/ebWTkxpPLpg))]([https://youtu.be/ebWTkxpPLpg)](https://youtu.be/ebWTkxpPLpg](https://youtu.be/bbRCyl6DJQU)))
 
 
 Çocukların uçak, araba veya internetin olmadığı herhangi bir yerde sıkılmadan vakit geçirmesi ve aynı zamanda öğrenmesi için tasarlandı! Dedektif Pati, minik kaşifleri dünyaca ünlü tarihi yapıların gizemlerini çözmeye davet ediyor.
