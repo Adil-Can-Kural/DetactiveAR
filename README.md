@@ -2,7 +2,9 @@
 # 🕵️‍♂️ Dedektif Pati: Uçuş Modu AR Macerası 🐾✈️
 
 **Çocuklar için %100 Çevrimdışı çalışan, uçak yolculuklarına özel tasarlanmış Artırılmış Gerçeklik (AR) eğitici dedektiflik oyunu!**
+
 Dedektif Pati Oynanış Videosu :
+
 [![Dedektif Pati Oynanış Videosu](https://img.youtube.com/vi/bbRCyl6DJQU/maxresdefault.jpg)](https://www.youtube.com/watch?v=bbRCyl6DJQU)
 
 
