@@ -12,12 +12,33 @@
 
 ---
 
+## 🚀 Hızlı Başlangıç: Oyunu İndir ve Oyna (Android)
+
+Oyunu hemen denemek için aşağıdaki adımları takip edin!
+
+1.  **APK Dosyasını İndir:**
+    *   Aşağıdaki linke tıklayarak oyunun `.apk` kurulum dosyasını telefonunuza indirin.
+
+      **[➡️ Dedektif Pati v1.0 APK İndir](https://github.com/Adil-Can-Kural/DetactiveAR/releases/download/DPTKV1.0/DPTKv1.0.apk)**
+      *(~Dosya Boyutu MB)*
+
+2.  **"Bilinmeyen Kaynaklar"a İzin Ver:**
+    *   Android, Google Play Store dışından indirilen uygulamaları kurmak için ek bir izin ister.
+    *   İndirdiğiniz dosyayı açmaya çalıştığınızda bir uyarı çıkarsa, "Ayarlar" butonuna dokunun ve "Bu kaynaktan gelenlere izin ver" seçeneğini aktif hale getirin.
+    *   Bu işlemi sadece bir kere yapmanız yeterlidir.
+
+3.  **Oyunu Kur:**
+    *   İzin verdikten sonra geri dönün ve "Yükle" butonuna dokunun.
+    *   Kurulum tamamlandıktan sonra "Aç" butonuna dokunarak maceraya başlayabilirsiniz!
+
+---
+
 ## 📖 Dokümantasyon
 
-Bu proje hakkında daha detaylı bilgi için aşağıdaki kılavuzları inceleyebilirsiniz:
+Daha detaylı bilgi için aşağıdaki kılavuzları inceleyebilirsiniz:
 
 *   **[🎮 Kullanıcı Kılavuzu (Nasıl Oynanır?)](./USER_MANUAL.md)**
-*   **[🔧 Kurulum Rehberi (Geliştiriciler İçin)](./INSTALLATION.md)**
+*   **[🔧 Geliştirici Rehberi (Projeyi Kurma)](./INSTALLATION.md)**
 
 ---
 
