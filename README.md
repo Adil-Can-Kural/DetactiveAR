@@ -9,7 +9,7 @@ Dedektif Pati Oynanış Videosu (Videoya Gitmek İçin Resme Tıklayın) :
 
 [![Dedektif Pati Oynanış Videosu](https://img.youtube.com/vi/bbRCyl6DJQU/maxresdefault.jpg)](https://www.youtube.com/watch?v=bbRCyl6DJQU)
 
-
+Dedektif Pati Sunum Videosu : https://youtu.be/ebWTkxpPLpg?si=vYfz2D8Q0gYYOIvv
 
 
 ---
