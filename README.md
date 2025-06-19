@@ -20,7 +20,7 @@ Oyunu hemen denemek için aşağıdaki adımları takip edin!
     *   Aşağıdaki linke tıklayarak oyunun `.apk` kurulum dosyasını telefonunuza indirin.
 
       **[➡️ Dedektif Pati v1.0 APK İndir](https://github.com/Adil-Can-Kural/DetactiveAR/releases/download/DPTKV1.0/DPTKv1.0.apk)**
-      *(~Dosya Boyutu MB)*
+      *(699 MB)*
 
 2.  **"Bilinmeyen Kaynaklar"a İzin Ver:**
     *   Android, Google Play Store dışından indirilen uygulamaları kurmak için ek bir izin ister.
