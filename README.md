@@ -193,6 +193,6 @@ Daha detaylı bilgi için aşağıdaki kılavuzları inceleyebilirsiniz:
 ## 📫 İletişim
 
 *   **Adil Can Kural**
-*   **E-posta:** 210541023@firat.edu.tr
+*   **E-posta:** Adilcan.Kural@hotmail.com
 *   **Trello:** [https://trello.com/b/WFMt2ofz/detectivear](https://trello.com/b/WFMt2ofz/detectivear)
 *   **GitHub Sitesi:** [Adil-Can-Kural.github.io](https://Adil-Can-Kural.github.io)
