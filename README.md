@@ -94,7 +94,7 @@ You can check the following guides for more detailed information:
 ## 📫 Contact
 
 *   **Adil Can Kural**
-*   **Email:** 210541023@firat.edu.tr
+*   **Email:** Adilcan.Kural@hotmail.com
 *   **Trello:** [https://trello.com/b/WFMt2ofz/detectivear](https://trello.com/b/WFMt2ofz/detectivear)
 *   **GitHub Site:** [Adil-Can-Kural.github.io](https://Adil-Can-Kural.github.io)
 
